@@ -314,6 +314,38 @@ cd Analysis-of-Time-Series-Forecasting-System-Requirements
 ```
 cp .env.example .env
 ```
+```
+cat > .env << 'EOF'
+# PostgreSQL
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=forecast_db
+DATABASE_URL=postgresql://postgres:postgres@db:5432/forecast_db
+
+# Redis
+REDIS_URL=redis://redis:6379/0
+
+# MinIO
+MINIO_ENDPOINT=minio:9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET=models
+
+# JWT
+SECRET_KEY=your-secret-key-change-this-in-production
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# Celery
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+# Qwen Service (опционально)
+QWEN_API_URL=http://qwen-service:5001/predict
+EOF
+```
+
 3. Запустить через Docker Compose
 ```
 docker-compose up -d
