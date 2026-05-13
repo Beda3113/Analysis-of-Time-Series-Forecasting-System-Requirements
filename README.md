@@ -54,103 +54,159 @@
 ### Структура Backend (`backend/src/`)
 
 ```
-├── api/                      # API слой
-│   ├── endpoints/            # Эндпоинты
-│   │   ├── auth.py           # Регистрация, логин, refresh
-│   │   ├── series.py         # CRUD временных рядов
-│   │   ├── training.py       # Запуск обучения, статус
-│   │   ├── forecast.py       # Прогнозы, экспорт, пакетный режим
-│   │   ├── interpretation.py # SHAP, LIME, отчёты
-│   │   ├── preprocessing.py  # Аномалии, стационарность
-│   │   └── external_models.py# Загрузка пользовательских моделей
-│   ├── schemas/              # Pydantic модели
+backend/src/
+├── api/                           # API слой
+│   ├── endpoints/                 # Эндпоинты
+│   │   ├── auth.py                # Регистрация, логин, refresh
+│   │   ├── series.py              # CRUD временных рядов
+│   │   ├── training.py            # Запуск обучения, статус
+│   │   ├── forecast.py            # Прогнозы, экспорт, пакетный режим
+│   │   ├── interpretation.py      # SHAP, LIME, отчёты
+│   │   ├── preprocessing.py       # Аномалии, стационарность
+│   │   └── external_models.py     # Загрузка пользовательских моделей
+│   ├── schemas/                   # Pydantic модели
+│   │   ├── __init__.py
 │   │   ├── auth.py
 │   │   ├── series.py
 │   │   ├── training.py
 │   │   ├── forecast.py
 │   │   ├── interpretation.py
 │   │   └── preprocessing.py
-│   ├── dependencies.py       # get_current_user, get_session
-│   └── router.py             # Регистрация всех роутеров
-├── core/                     # Бизнес-логика ML
-│   ├── forecasting/          # Модели прогнозирования
-│   │   ├── base.py           # Абстрактный BaseForecaster
+│   ├── __init__.py
+│   ├── dependencies.py            # get_current_user, get_session
+│   └── router.py                  # Регистрация всех роутеров
+│
+├── core/                          # Бизнес-логика ML
+│   ├── forecasting/               # Модели прогнозирования
+│   │   ├── __init__.py
+│   │   ├── base.py                # Абстрактный BaseForecaster
 │   │   ├── xgboost_forecaster.py
 │   │   ├── lstm_forecaster.py
 │   │   ├── prophet_forecaster.py
 │   │   ├── sarima_forecaster.py
-│   │   ├── ensemble.py       # Ансамбль моделей
-│   │   └── registry.py       # Фабрика моделей
-│   ├── feature_engineering/  # Инженерия признаков
-│   │   ├── lag_creator.py    # Лаги t-1, t-2, t-7...
-│   │   ├── rolling_stats.py  # Скользящие средние, std
-│   │   └── validator.py      # Проверка на lookahead
-│   ├── interpretation/       # Интерпретация
+│   │   ├── ensemble.py            # Ансамбль моделей
+│   │   └── registry.py            # Фабрика моделей
+│   ├── feature_engineering/       # Инженерия признаков
+│   │   ├── __init__.py
+│   │   ├── lag_creator.py         # Лаги t-1, t-2, t-7...
+│   │   ├── rolling_stats.py       # Скользящие средние, std
+│   │   └── validator.py           # Проверка на lookahead
+│   ├── interpretation/            # Интерпретация
+│   │   ├── __init__.py
 │   │   ├── shap_explainer.py
 │   │   ├── lime_explainer.py
-│   │   ├── text_report.py    # Генерация текстовых отчётов
+│   │   ├── text_report.py         # Генерация текстовых отчётов
 │   │   └── cached_explainer.py
-│   └── preprocessing/        # Предобработка
-│       ├── anomaly_detector.py   # Z-score, IQR, STL
-│       ├── stationarity_tester.py# ADF тест
-│       └── decomposer.py         # Декомпозиция
-├── services/                 # Сервисный слой
+│   ├── preprocessing/             # Предобработка
+│   │   ├── __init__.py
+│   │   ├── anomaly_detector.py    # Z-score, IQR, STL
+│   │   ├── stationarity_tester.py # ADF тест
+│   │   └── decomposer.py          # Декомпозиция
+│   └── __init__.py
+│
+├── services/                      # Сервисный слой
+│   ├── __init__.py
 │   ├── training_service.py
 │   ├── forecast_service.py
 │   ├── interpretation_service.py
 │   └── external_model_service.py
-├── storage/                  # Хранение данных
+│
+├── storage/                       # Хранение данных
 │   ├── postgres/
-│   │   ├── models.py         # SQLAlchemy ORM
-│   │   ├── crud.py           # Асинхронные CRUD
-│   │   └── connection.py     # Engine и сессии
+│   │   ├── __init__.py
+│   │   ├── models.py              # SQLAlchemy ORM
+│   │   ├── crud.py                # Асинхронные CRUD
+│   │   └── connection.py          # Engine и сессии
 │   ├── redis/
+│   │   ├── __init__.py
 │   │   ├── client.py
-│   │   ├── cache.py          # Кэш прогнозов и объяснений
-│   │   └── rate_limiter.py   # Счётчики для rate limiting
-│   └── minio/
-│       ├── client.py         # boto3 клиент
-│       ├── model_storage.py  # Сохранение/загрузка моделей
-│       ├── ttl_manager.py    # Автоудаление старых файлов
-│       └── signed_urls.py    # Подписанные URL
-├── workers/                  # Celery задачи
-│   ├── celery_app.py         # Конфигурация Celery
-│   ├── config.py             # Настройки воркеров
-│   ├── signals.py            # Обработчики SIGTERM, SIGSEGV
+│   │   ├── cache.py               # Кэш прогнозов и объяснений
+│   │   └── rate_limiter.py        # Счётчики для rate limiting
+│   ├── minio/
+│   │   ├── __init__.py
+│   │   ├── client.py              # boto3 клиент
+│   │   ├── model_storage.py       # Сохранение/загрузка моделей
+│   │   ├── ttl_manager.py         # Автоудаление старых файлов
+│   │   └── signed_urls.py         # Подписанные URL
+│   └── __init__.py
+│
+├── workers/                       # Celery задачи
+│   ├── __init__.py
+│   ├── celery_app.py              # Конфигурация Celery
+│   ├── config.py                  # Настройки воркеров
+│   ├── signals.py                 # Обработчики SIGTERM, SIGSEGV
 │   └── tasks/
-│       ├── training.py       # Обучение XGBoost, LSTM, Prophet, SARIMA
-│       ├── interpretation.py # SHAP, LIME, отчёты
-│       └── maintenance.py    # Очистка, архивация, health check
-├── config.py                 # Pydantic settings
-└── main.py                   # Точка входа FastAPI
+│       ├── __init__.py
+│       ├── training.py            # Обучение XGBoost, LSTM, Prophet, SARIMA
+│       ├── interpretation.py      # SHAP, LIME, отчёты
+│       └── maintenance.py         # Очистка, архивация, health check
+│
+├── __init__.py
+├── config.py                      # Pydantic settings
+└── main.py                        # Точка входа FastAPI
 ```
 
 Кодовая база фронтенда организована следующим образом:
 
 ```
-Структура фронтенда:
-├── api/                      # API-клиенты
-│   ├── client.ts             # Axios с интерцепторами
-│   ├── auth.ts               # Логин, регистрация, refresh
-│   ├── series.ts             # Загрузка, список, удаление
-│   ├── training.ts           # Запуск обучения, статус
-│   └── forecast.ts           # Прогноз, экспорт
-├── contexts/
-│   └── AuthContext.tsx       # React Context для авторизации
-├── pages/                    # Страницы
+
+```
+frontend/src/
+├── api/                           # API-клиенты
+│   ├── client.ts                  # Axios с интерцепторами
+│   ├── auth.ts                    # Логин, регистрация, refresh
+│   ├── series.ts                  # Загрузка, список, удаление
+│   ├── training.ts                # Запуск обучения, статус
+│   ├── forecast.ts                # Прогноз, экспорт
+│   ├── interpretation.ts          # SHAP, LIME, отчёты (добавлено)
+│   └── preprocessing.ts           # Аномалии, стационарность (добавлено)
+│
+├── components/                    # Переиспользуемые компоненты (добавлено)
+│   ├── Layout.tsx                 # Общий лейаут
+│   ├── Navigation.tsx             # Навигационное меню
+│   ├── LoadingSpinner.tsx         # Индикатор загрузки
+│   ├── ErrorBoundary.tsx          # Обработка ошибок
+│   └── Charts/
+│       ├── ForecastChart.tsx      # График прогноза
+│       └── SHAPPlot.tsx           # Визуализация SHAP значений
+│
+├── contexts/                      # React Context
+│   ├── AuthContext.tsx            # Контекст авторизации
+│   └── ThemeContext.tsx           # Контекст темы (добавлено)
+│
+├── hooks/                         # Кастомные хуки (добавлено)
+│   ├── useAuth.ts                 # Хук для работы с авторизацией
+│   ├── usePolling.ts              # Хук для polling статуса обучения
+│   └── useChartData.ts            # Хук для подготовки данных графиков
+│
+├── pages/                         # Страницы
 │   ├── Login.tsx
 │   ├── Register.tsx
-│   ├── Dashboard.tsx         # Список рядов
-│   ├── Upload.tsx            # Загрузка CSV/Excel
-│   ├── Training.tsx          # Обучение с polling
-│   ├── Forecast.tsx          # График прогноза
-│   └── Interpretation.tsx    # SHAP, LIME, Qwen
+│   ├── Dashboard.tsx              # Список рядов
+│   ├── Upload.tsx                 # Загрузка CSV/Excel
+│   ├── Training.tsx               # Обучение с polling
+│   ├── Forecast.tsx               # График прогноза
+│   ├── Interpretation.tsx         # SHAP, LIME, Qwen
+│   └── Preprocessing.tsx          # Предобработка (добавлено)
+│
+├── types/                         # TypeScript типы (добавлено)
+│   ├── auth.ts
+│   ├── series.ts
+│   ├── forecast.ts
+│   └── training.ts
+│
+├── utils/                         # Утилиты (добавлено)
+│   ├── dateFormatter.ts           # Форматирование дат
+│   ├── csvValidator.ts            # Валидация CSV файлов
+│   └── errorHandler.ts            # Обработка ошибок API
+│
 ├── styles/
-│   └── globals.css
-├── App.tsx                   # Роутинг
-└── main.tsx                  # Точка входа
-```
-
+│   ├── globals.css
+│   └── themes.css                 # Темизация (добавлено)
+│
+├── App.tsx                        # Роутинг
+├── main.tsx                       # Точка входа
+└── vite-env.d.ts                  # Типы для Vite (добавлено)
 ---
 
 ## №4. Ключевые функциональные модули
