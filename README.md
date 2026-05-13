@@ -308,7 +308,7 @@ frontend/src/
 
 ```
 git clone https://github.com/Beda3113/Analysis-of-Time-Series-Forecasting-System-Requirements
-cd time-series-platform
+cd Analysis-of-Time-Series-Forecasting-System-Requirements
 ```
 2. Настроить переменные окружения
 ```
