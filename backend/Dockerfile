@@ -18,10 +18,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Копируем requirements и устанавливаем зависимости
 COPY requirements.txt .
 
-# Обновляем pip и устанавливаем зависимости в правильном порядке
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir uvicorn fastapi && \
-    pip install --no-cache-dir -r requirements.txt
+# Обновляем pip и устанавливаем зависимости
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir uvicorn==0.24.0 fastapi==0.104.1
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
